@@ -19,7 +19,7 @@ export async function addRecommendationAction(
   if (!name) return { success: false, error: "상품명을 입력해주세요." };
   if (!submittedBy) return { success: false, error: "추천자를 입력해주세요." };
 
-  const result = addRecommendation({
+  const result = await addRecommendation({
     name,
     flavor: "",
     reason: reason || undefined,
@@ -40,6 +40,6 @@ export async function addRecommendationAction(
 }
 
 export async function deleteRecommendationAction(id: string): Promise<void> {
-  deleteRecommendation(id);
+  await deleteRecommendation(id);
   revalidatePath("/");
 }

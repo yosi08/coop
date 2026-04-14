@@ -1,36 +1,27 @@
-import fs from "fs";
-import path from "path";
+import { Redis } from "@upstash/redis";
 import type { Recommendation } from "../types";
 import { getDedupeKey } from "./dedup";
 
-// Next.js 서버 런타임 전용 (Server Components / Server Actions에서만 import)
-const DATA_FILE = path.join(process.cwd(), "data", "recommendations.json");
+const redis = new Redis({
+  url: process.env.UPSTASH_REDIS_REST_URL!,
+  token: process.env.UPSTASH_REDIS_REST_TOKEN!,
+});
 
-function ensureDataFile(): void {
-  const dir = path.dirname(DATA_FILE);
-  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-  if (!fs.existsSync(DATA_FILE)) fs.writeFileSync(DATA_FILE, "[]", "utf-8");
+const KEY = "recommendations";
+
+export async function readAll(): Promise<Recommendation[]> {
+  const data = await redis.get<Recommendation[]>(KEY);
+  return data ?? [];
 }
 
-export function readAll(): Recommendation[] {
-  ensureDataFile();
-  const raw = fs.readFileSync(DATA_FILE, "utf-8");
-  return JSON.parse(raw) as Recommendation[];
+async function writeAll(items: Recommendation[]): Promise<void> {
+  await redis.set(KEY, items);
 }
 
-function writeAll(items: Recommendation[]): void {
-  ensureDataFile();
-  fs.writeFileSync(DATA_FILE, JSON.stringify(items, null, 2), "utf-8");
-}
-
-/**
- * 새 추천을 추가합니다.
- * 같은 name + flavor 조합이 이미 존재하면 null을 반환 (중복 거부).
- */
-export function addRecommendation(
+export async function addRecommendation(
   data: Omit<Recommendation, "id" | "createdAt">
-): { added: Recommendation } | { duplicate: Recommendation } {
-  const items = readAll();
+): Promise<{ added: Recommendation } | { duplicate: Recommendation }> {
+  const items = await readAll();
   const newKey = getDedupeKey(data.name, data.flavor);
 
   const existing = items.find(
@@ -47,14 +38,14 @@ export function addRecommendation(
     createdAt: new Date().toISOString(),
   };
 
-  writeAll([...items, newItem]);
+  await writeAll([...items, newItem]);
   return { added: newItem };
 }
 
-export function deleteRecommendation(id: string): boolean {
-  const items = readAll();
+export async function deleteRecommendation(id: string): Promise<boolean> {
+  const items = await readAll();
   const filtered = items.filter((item) => item.id !== id);
   if (filtered.length === items.length) return false;
-  writeAll(filtered);
+  await writeAll(filtered);
   return true;
 }

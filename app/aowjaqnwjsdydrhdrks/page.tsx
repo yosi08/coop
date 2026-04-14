@@ -3,7 +3,7 @@ import { deduplicate } from "../lib/dedup";
 import RecommendationList from "../components/RecommendationList";
 
 export default async function AdminPage() {
-  const all = readAll();
+  const all = await readAll();
   const { unique, duplicates } = deduplicate(all);
 
   return (
