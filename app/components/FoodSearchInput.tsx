@@ -44,7 +44,7 @@ export default function FoodSearchInput({ onSelect }: Props) {
       setResults([]);
       return;
     }
-    debounceRef.current = setTimeout(() => search(value.trim()), 500);
+    debounceRef.current = setTimeout(() => search(value.trim()), 300);
   }
 
   function handleSelect(info: NutritionInfo) {

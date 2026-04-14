@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import type { FoodApiRow } from "../../lib/nutrition";
 import { toNutritionInfo } from "../../lib/nutrition";
 
+export const revalidate = 86400; // 24시간 라우트 캐시
+
 const API_KEY = process.env.FOOD_SAFETY_API_KEY ?? "";
 const BASE = "https://apis.data.go.kr/1471000/FoodNtrCpntDbInfo02/getFoodNtrCpntDbInq02";
 
@@ -27,7 +29,7 @@ export async function GET(req: NextRequest) {
   url.searchParams.set("type", "json");
 
   try {
-    const res = await fetch(url.toString(), { next: { revalidate: 60 } });
+    const res = await fetch(url.toString(), { next: { revalidate: 86400 } });
 
     if (!res.ok) {
       return NextResponse.json({ error: "API 호출 실패" }, { status: 502 });
