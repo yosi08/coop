@@ -32,7 +32,9 @@ export async function GET(req: NextRequest) {
     const res = await fetch(url.toString(), { next: { revalidate: 86400 } });
 
     if (!res.ok) {
-      return NextResponse.json({ error: "API 호출 실패" }, { status: 502 });
+      const body = await res.text();
+      console.error("[food-search] 외부 API 오류", res.status, body);
+      return NextResponse.json({ error: `외부 API 오류 (${res.status})`, detail: body }, { status: 502 });
     }
 
     const json = await res.json();
