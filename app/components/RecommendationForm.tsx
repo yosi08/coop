@@ -35,16 +35,10 @@ export default function RecommendationForm() {
           className={`rounded-lg px-4 py-3 text-sm font-medium ${
             result.success
               ? "bg-green-50 text-green-700 border border-green-200"
-              : "duplicate" in result && result.duplicate
-              ? "bg-yellow-50 text-yellow-700 border border-yellow-200"
               : "bg-red-50 text-red-700 border border-red-200"
           }`}
         >
-          {result.success
-            ? result.message
-            : "duplicate" in result && result.duplicate
-            ? `이미 등록된 항목입니다: "${result.existingName}"`
-            : "error" in result && result.error}
+          {result.success ? result.message : result.error}
         </div>
       )}
 

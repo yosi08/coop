@@ -1,11 +1,11 @@
 "use client";
 
 import { useTransition } from "react";
-import type { Recommendation } from "../types";
-import { deleteRecommendationAction } from "../actions";
+import type { GroupedRecommendation } from "../types";
+import { deleteByKeyAction } from "../actions";
 
 interface Props {
-  items: Recommendation[];
+  items: GroupedRecommendation[];
 }
 
 export default function RecommendationList({ items }: Props) {
@@ -20,18 +20,18 @@ export default function RecommendationList({ items }: Props) {
   return (
     <div className="flex flex-col gap-3">
       {items.map((item) => (
-        <RecommendationCard key={item.id} item={item} />
+        <RecommendationCard key={item.key} item={item} />
       ))}
     </div>
   );
 }
 
-function RecommendationCard({ item }: { item: Recommendation }) {
+function RecommendationCard({ item }: { item: GroupedRecommendation }) {
   const [isPending, startTransition] = useTransition();
 
   function handleDelete() {
     startTransition(async () => {
-      await deleteRecommendationAction(item.id);
+      await deleteByKeyAction(item.key);
     });
   }
 
@@ -43,6 +43,10 @@ function RecommendationCard({ item }: { item: Recommendation }) {
     >
       <div className="flex flex-col gap-1 min-w-0">
         <div className="flex items-center gap-2 flex-wrap">
+          {/* 카운트 배지 */}
+          <span className="shrink-0 inline-flex items-center justify-center rounded-full bg-blue-600 text-white text-xs font-bold w-6 h-6">
+            {item.count}
+          </span>
           <span className="font-semibold text-zinc-800 text-base">{item.name}</span>
           {item.flavor && (
             <span className="rounded-full bg-blue-100 text-blue-700 text-xs px-2 py-0.5 font-medium">
@@ -50,13 +54,26 @@ function RecommendationCard({ item }: { item: Recommendation }) {
             </span>
           )}
         </div>
-        {item.reason && (
-          <p className="text-sm text-zinc-500 mt-0.5 truncate">{item.reason}</p>
+
+        {item.submitters.length > 0 && (
+          <p className="text-xs text-zinc-500 mt-0.5">
+            추천: {item.submitters.join(", ")}
+          </p>
         )}
-        <div className="flex items-center gap-2 mt-1 text-xs text-zinc-400">
-          {item.submittedBy && <span>추천: {item.submittedBy}</span>}
-          <span>{new Date(item.createdAt).toLocaleDateString("ko-KR")}</span>
-        </div>
+
+        {item.reasons.length > 0 && (
+          <ul className="mt-0.5 space-y-0.5">
+            {item.reasons.map((r, i) => (
+              <li key={i} className="text-xs text-zinc-400 truncate">
+                &ldquo;{r}&rdquo;
+              </li>
+            ))}
+          </ul>
+        )}
+
+        <p className="text-xs text-zinc-400 mt-1">
+          {new Date(item.latestCreatedAt).toLocaleDateString("ko-KR")}
+        </p>
       </div>
 
       <button

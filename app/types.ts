@@ -7,10 +7,15 @@ export interface Recommendation {
   createdAt: string;  // ISO 8601
 }
 
-// 중복 제거 기준: name + flavor 조합 (대소문자 무시, 공백 무시)
 export type DedupeKey = string; // `${normalizedName}::${normalizedFlavor}`
 
-export interface DedupeResult {
-  unique: Recommendation[];
-  duplicates: Array<{ kept: Recommendation; removed: Recommendation[] }>;
+export interface GroupedRecommendation {
+  key: DedupeKey;
+  name: string;
+  flavor: string;
+  count: number;
+  submitters: string[];
+  reasons: string[];
+  latestCreatedAt: string;
+  ids: string[];
 }
