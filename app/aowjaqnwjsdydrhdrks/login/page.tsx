@@ -1,53 +1,80 @@
-"use client";
+import { signIn } from "@/auth";
 
-import { useActionState } from "react";
-import { loginAction } from "./actions";
-
-export default function LoginPage() {
-  const [error, formAction, isPending] = useActionState<string | null, FormData>(
-    loginAction,
-    null
-  );
-
+export default function LoginPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ error?: string }>;
+}) {
   return (
     <main className="min-h-screen bg-zinc-50 flex items-center justify-center px-4">
       <div className="w-full max-w-sm bg-white rounded-2xl shadow-sm border border-zinc-200 p-8 flex flex-col gap-6">
         <div>
           <h1 className="text-xl font-bold text-zinc-900">관리자 로그인</h1>
-          <p className="mt-1 text-sm text-zinc-500">재고 확인 페이지에 접근하려면 비밀번호가 필요합니다.</p>
+          <p className="mt-1 text-sm text-zinc-500">
+            등록된 Google 계정으로만 접근할 수 있습니다.
+          </p>
         </div>
 
-        <form action={formAction} className="flex flex-col gap-4">
-          {error && (
-            <div className="rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
-              {error}
-            </div>
-          )}
+        <ErrorMessage searchParams={searchParams} />
 
-          <div className="flex flex-col gap-1">
-            <label className="text-sm font-medium text-zinc-600" htmlFor="password">
-              비밀번호
-            </label>
-            <input
-              id="password"
-              name="password"
-              type="password"
-              required
-              autoFocus
-              placeholder="비밀번호 입력"
-              className="rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
-            />
-          </div>
-
+        <form
+          action={async () => {
+            "use server";
+            await signIn("google", { redirectTo: "/aowjaqnwjsdydrhdrks" });
+          }}
+        >
           <button
             type="submit"
-            disabled={isPending}
-            className="rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-blue-700 disabled:opacity-50 transition-colors"
+            className="w-full flex items-center justify-center gap-3 rounded-xl border border-zinc-300 bg-white px-5 py-2.5 text-sm font-semibold text-zinc-700 hover:bg-zinc-50 transition-colors shadow-sm"
           >
-            {isPending ? "확인 중..." : "로그인"}
+            <GoogleIcon />
+            Google로 로그인
           </button>
         </form>
       </div>
     </main>
+  );
+}
+
+async function ErrorMessage({
+  searchParams,
+}: {
+  searchParams: Promise<{ error?: string }>;
+}) {
+  const { error } = await searchParams;
+  if (!error) return null;
+
+  const message =
+    error === "AccessDenied"
+      ? "접근 권한이 없는 계정입니다."
+      : "로그인 중 오류가 발생했습니다.";
+
+  return (
+    <div className="rounded-lg bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
+      {message}
+    </div>
+  );
+}
+
+function GoogleIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 18 18">
+      <path
+        fill="#4285F4"
+        d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"
+      />
+      <path
+        fill="#34A853"
+        d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"
+      />
+      <path
+        fill="#FBBC05"
+        d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"
+      />
+      <path
+        fill="#EA4335"
+        d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58z"
+      />
+    </svg>
   );
 }
