@@ -65,6 +65,7 @@ export default function FoodSearchInput({ onSelect }: Props) {
         type="text"
         value={query}
         onChange={(e) => handleQueryChange(e.target.value)}
+        onKeyDown={(e) => e.key === "Enter" && e.preventDefault()}
         placeholder="상품명 입력 (2자 이상, 예: 포카칩)"
         className="rounded-lg border border-blue-300 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
       />
