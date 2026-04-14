@@ -43,11 +43,9 @@ function RecommendationCard({ item }: { item: GroupedRecommendation }) {
     >
       <div className="flex flex-col gap-1 min-w-0">
         <div className="flex items-center gap-2 flex-wrap">
-          {/* 카운트 배지 */}
-          <span className="shrink-0 inline-flex items-center justify-center rounded-full bg-blue-600 text-white text-xs font-bold w-6 h-6">
-            {item.count}
-          </span>
           <span className="font-semibold text-zinc-800 text-base">{item.name}</span>
+          {/* 카운트 */}
+          <span className="text-sm font-medium" style={{ color: "#9db8d4" }}>{item.count}</span>
           {item.flavor && (
             <span className="rounded-full bg-blue-100 text-blue-700 text-xs px-2 py-0.5 font-medium">
               {item.flavor}
