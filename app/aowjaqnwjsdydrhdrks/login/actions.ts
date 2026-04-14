@@ -22,5 +22,5 @@ export async function loginAction(
     // 브라우저 세션 동안 유지 (maxAge 미설정)
   });
 
-  redirect("/admin");
+  redirect("/aowjaqnwjsdydrhdrks");
 }
