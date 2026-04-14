@@ -15,6 +15,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "매점 재고 추천",
   description: "매점부 재고 추천 시스템",
+  icons: {
+    icon: "/icon.png",
+  },
 };
 
 export default function RootLayout({
