@@ -24,6 +24,8 @@ export default function RecommendationForm() {
   }
 
   const isUnsafe = selected?.judgment.result === "unsafe";
+  const isUnknown = selected?.judgment.result === "unknown";
+  const isSafe = selected?.judgment.result === "safe";
 
   return (
     <form action={formAction} className="bg-white rounded-2xl shadow-sm border border-zinc-200 p-6 flex flex-col gap-4">
@@ -54,10 +56,13 @@ export default function RecommendationForm() {
       {selected && (
         <>
           <NutritionCard info={selected} onReset={handleReset} />
+          <input type="hidden" name="judgmentResult" value={selected.judgment.result} />
 
-          {isUnsafe ? (
+          {isUnsafe || isUnknown ? (
             <div className="rounded-xl bg-red-50 border border-red-200 px-4 py-4 text-sm text-red-700 text-center font-medium">
-              고열량·저영양 기준 부적합 상품은 추천할 수 없습니다.
+              {isUnsafe
+                ? "고열량·저영양 기준 부적합 상품은 추천할 수 없습니다."
+                : "판정불가 상품은 추천할 수 없습니다."}
             </div>
           ) : (
             <>
@@ -74,7 +79,8 @@ export default function RecommendationForm() {
                     required
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="rounded-lg border border-zinc-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                    readOnly={isSafe}
+                    className={`rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 ${isSafe ? "border-zinc-200 bg-zinc-50 text-zinc-500 cursor-default" : "border-zinc-300"}`}
                   />
                 </div>
 
